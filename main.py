@@ -322,6 +322,8 @@ def editState(state_id):
     if request.method == 'POST':
         if request.form['name']:
           editedState.name = request.form['name']
+        if request.form['abbrev']:
+          editedState.abbrev = request.form['abbrev']
           flash('State Successfully Edited %s' % editedState.name)
           return redirect(url_for('showStates'))
     else:
@@ -354,22 +356,19 @@ def deleteState(state_id):
     return redirect('/state/')
 
 #Show a state's sites
+#Anybody can add a site
 @app.route('/state/<int:state_id>/')
 @app.route('/state/<int:state_id>/site/')
-def showSite(site_id):
-  state = session.query(State).filter_by(id = state_id).one()
+def showSite(state_id):
+  state = session.query(State).filter_by(id = state_id).first()
   sites = session.query(Site).filter_by(state_id = state_id).all()
   creator = ""
-  # reinstate this when get login set up
-#  if request.args.get('state') == login_session['state']:
-  # ownsSites = thisSiteOwner(login_session['user_id'], state_id)
-  # creator = getUserInfo(login_session['user_id'])
-  # if ownsSites:
-  #   return render_template('site.html', sites = sites, state = states, creator = creator)
-  # else:
-  return render_template('publicsite.html', sites = sites, state = state, creator = creator)
-  # else:
-  #   return render_template('publicsite.html', items = items, restaurant = restaurant, creator = creator)
+  currentUserID = login_session['user_id']
+  if 'username' not in login_session:
+    return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+  else:
+    creator = getUserID(login_session['user_id'])
+    return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
 
 #Create a new site
 @app.route('/state/<int:state_id>/site/new/', methods=['GET','POST'])
@@ -381,20 +380,20 @@ def newSite(state_id):
   # if allowedToAdd:
   state = session.query(State).filter_by(id = state_id).one()
   if request.method == 'POST':
-      newSite = Site(name = request.form['name'],
-                     notes = request.form['notes'],
-                     city = request.form['city'],
-                     site_type = request.form['site_type'],
-                     phone = request.form['phone'],
-                     website = request.form['website'],
-                     state_id = state_id,
-                     user_id = state.user_id)
-      session.add(newSite)
-      session.commit()
-      flash('New Site (%s) Successfully Created' % (newSite.name))
-      return redirect(url_for('showSite', state_id = state_id))
+    newSite = Site(name = request.form['name'],
+                   notes = request.form['notes'],
+                   city = request.form['city'],
+                   site_type = request.form['site_type'],
+                   phone = request.form['phone'],
+                   website = request.form['website'],
+                   state_id = state_id,
+                   user_id = login_session['user_id'])
+    session.add(newSite)
+    session.commit()
+    flash('New Site (%s) Successfully Created' % (newSite.name))
+    return redirect(url_for('showSite', state_id = state_id))
   else:
-      return render_template('newsite.html', state_id = state_id)
+    return render_template('newsite.html', state_id = state_id)
   # else:
   #   flash('Only the owner of the restaurant can add menu items. Allowed to add: %s' % allowedToAdd)
   #   return redirect('/restaurant/%s/menu' % restaurant_id)
@@ -406,29 +405,27 @@ def editSite(state_id, site_id):
     return redirect('/login')
   allowedToEdit = thisSiteOwner(login_session['user_id'], site_id)
   if allowedToEdit:
-    editedSite = session.query(Site).filter_by(id = site_id).one()
-    state = session.query(State).filter_by(id = state_id).one()
+    editedSite = session.query(Site).filter_by(id = site_id).first()
+    state = session.query(State).filter_by(id = state_id).first()
     if request.method == 'POST':
         if request.form['name']:
-            editedItem.name = request.form['name']
+            editedSite.name = request.form['name']
         if request.form['notes']:
-            editedItem.notes = request.form['notes']
-        if request.form['abbrev']:
-            editedItem.abbrev = request.form['abbrev']
+            editedSite.notes = request.form['notes']
         if request.form['site_type']:
-            editedItem.site_type = request.form['site_type']
+            editedSite.site_type = request.form['site_type']
         if request.form['city']:
-            editedItem.city = request.form['city']
-        if request.form['phone']:
-            editedItem.phone = request.form['phone']
-        if request.form['website']:
-            editedItem.website = request.form['website']
+            editedSite.city = request.form['city']
+        # if request.form['phone']:
+            # editedSite.phone = request.form['phone']
+        # if request.form['website']:
+            # editedSite.website = request.form['website']
         session.add(editedSite)
         session.commit()
         flash('Site Successfully Edited')
-        return redirect(url_for('showSite', state_id = state_id))
+        return redirect('/state/%s/site/' % state_id)
     else:
-        return render_template('editmenuitem.html', restaurant_id = restaurant_id, menu_id = menu_id, item = editedItem)
+        return render_template('editSite.html', state_id = state_id, site_id = site_id, site = editedSite)
   else:
     flash('Only the owner can edit this site. Allowed to edit: %s' % allowedToEdit)
     return redirect('/state/%s/site/' % state_id)
@@ -463,7 +460,7 @@ def getUserID(email):
 
 def getUserInfo(user_id):
   try:
-    user = session.query(User).filter_by(id = user_id).one()
+    user = session.query(User).filter_by(id = user_id).first()
     return user
   except:
     None
