@@ -1,11 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
 {% include "header.html" %}
-	<div class="row top-menu">
-		<div class="col-md-10"></div>
-		<div class="col-md-2 text-right">
-					</div>
-	</div>
 	<div class="row divider blue">
 		<div class="col-md-12"></div>
 	</div>
@@ -32,24 +27,49 @@
 
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
-		<div class="col-md-10 padding-none">
+		<div class="col-md-1 padding-none">
 			<a href="{{url_for('addState')}}">
-				<button class="btn btn-default" id="new-restaurant">
-					<span class="glyphicon glyphicon-cutlery" aria-hidden="true"></span>Add New State
+				<button class="btn btn-default" id="new-state">
+					<span class="glyphicon glyphicon-map" aria-hidden="true"></span>Add New State
 				</button>
 			</a>
 		</div>
 		<div class="col-md-1"></div>
+		<div class="col-md-1">
+			<a href="{{url_for('newSiteNoState')}}">
+				<button class="btn btn-default" id="new-site">
+					<span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
+				</button>
+			</a>
+		</div>
 	</div>
 	{% for state in states %}
+		{% if state.id in sites %}
 		<a href = "{{url_for('showSite', state_id = state.id)}}">
 			<div class="row">
 				<div class="col-md-1"></div>
-					<div class="col-md-10 restaurant-list">
-						<h3>{{state.abbrev}} - {{state.name}} - {{state.id}} - {{state.user_id}}</h3>
+					<div class="col-md-10 state-list">
+						<h3>
+							{{state.abbrev}} - {{state.name}} - {{state.id}} - {{state.user_id}}
+							{% if currentUserID == 1 %}
+									<a href="{{url_for('editState', state_id = state.id )}}">
+									<button class="btn btn-default" id="edit-state" type="button">
+									<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+									Edit State
+									</button>
+									</a>
+						<!--only delete state if there are no sites-->
+						<a href="{{url_for('deleteState', state_id = state.id )}}">
+				<button class="btn btn-default delete" id="delete-state">
+					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete State
+				</button>
+			</a>
+							{% endif %}
+						</h3>
 					</div>
 				<div class="col-md-1"></div>
 			</div>
 		</a>
+		{% endif %}
 	{% endfor %}
 {% endblock %}

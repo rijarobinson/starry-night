@@ -285,10 +285,17 @@ def statesJSON():
 @app.route('/state/')
 def showStates():
   states = session.query(State).order_by(asc(State.name))
-  if login_session['username']:
-    return render_template('states.html', states = states)
+  allSites = session.query(Site).order_by(asc(Site.name))
+  siteList = []
+  for a in allSites:
+    siteList.append(a.state_id)
+  currentUserID = login_session['user_id']
+  # Only the administrator is allowed to add states.
+  if currentUserID != 1:
+    return render_template('publicstates.html', states = states, sites = siteList)
   else:
-    return render_template('publicstates.html', states = states)
+    return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID)
+
 
 # Need to add functionality that requires user to add a site
 # when adding a state, and also check to make sure they only add
@@ -300,14 +307,14 @@ def addState():
   if 'username' not in login_session:
     return redirect('/login')
   if request.method == 'POST':
-      user_id = login_session['user_id']
-      name = request.form['name']
-      abbrev = request.form['abbrev']
-      newState = State(name = name, abbrev = abbrev, user_id = user_id)
-      session.add(newState)
-      flash('New State %s Successfully Created' % newState.name)
-      session.commit()
-      return redirect(url_for('showStates'))
+    user_id = login_session['user_id']
+    name = request.form['name']
+    abbrev = request.form['abbrev']
+    newState = State(name = name, abbrev = abbrev, user_id = user_id)
+    session.add(newState)
+    flash('New State %s Successfully Created' % newState.name)
+    session.commit()
+    return redirect(url_for('showStates'))
   else:
       return render_template('addState.html')
 
@@ -364,8 +371,8 @@ def showSite(state_id):
   sites = session.query(Site).filter_by(state_id = state_id).all()
   creator = ""
   currentUserID = login_session['user_id']
-  if 'username' not in login_session:
-    return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+  if not currentUserID:
+    return render_template('publicsite.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
   else:
     creator = getUserID(login_session['user_id'])
     return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
@@ -375,10 +382,9 @@ def showSite(state_id):
 def newSite(state_id):
   if 'username' not in login_session:
     return redirect('/login')
-#Anybody can add a site to a state
-  # allowedToAdd = thisRestaurantOwner(login_session['user_id'], restaurant_id)
-  # if allowedToAdd:
+#Any logged in user can add a site to a state
   state = session.query(State).filter_by(id = state_id).one()
+  state_name = state.name
   if request.method == 'POST':
     newSite = Site(name = request.form['name'],
                    notes = request.form['notes'],
@@ -393,10 +399,37 @@ def newSite(state_id):
     flash('New Site (%s) Successfully Created' % (newSite.name))
     return redirect(url_for('showSite', state_id = state_id))
   else:
-    return render_template('newsite.html', state_id = state_id)
-  # else:
-  #   flash('Only the owner of the restaurant can add menu items. Allowed to add: %s' % allowedToAdd)
-  #   return redirect('/restaurant/%s/menu' % restaurant_id)
+    return render_template('newsite.html', state_id = state_id, state_name = state_name)
+
+#Create a new site from the state page
+@app.route('/state/site/new/', methods=['GET','POST'])
+def newSiteNoState():
+  if 'username' not in login_session:
+    return redirect('/login')
+#Any logged in user can add a site
+  states = session.query(State).order_by(asc(State.name)).all()
+  state_list = []
+  for state in states:
+    state_list.append(state.name)
+  if request.method == 'POST':
+    state_name = request.form['state']
+    state = session.query(State).filter_by(name = state_name).first()
+    state_link = state.id
+    newSite = Site(name = request.form['name'],
+                   notes = request.form['notes'],
+                   city = request.form['city'],
+                   site_type = request.form['site_type'],
+                   phone = request.form['phone'],
+                   website = request.form['website'],
+                   state_id = state_link,
+                   user_id = login_session['user_id'])
+    session.add(newSite)
+    session.commit()
+    flash('New Site (%s) Successfully Created' % (newSite.name))
+    return redirect(url_for('showSite', state_id = state_link))
+  else:
+    return render_template('newsitenostate.html', state_list = state_list)
+
 
 #Edit a site
 @app.route('/state/<int:state_id>/site/<int:site_id>/edit', methods=['GET','POST'])
@@ -416,10 +449,10 @@ def editSite(state_id, site_id):
             editedSite.site_type = request.form['site_type']
         if request.form['city']:
             editedSite.city = request.form['city']
-        # if request.form['phone']:
-            # editedSite.phone = request.form['phone']
-        # if request.form['website']:
-            # editedSite.website = request.form['website']
+        if request.form['phone']:
+            editedSite.phone = request.form['phone']
+        if request.form['website']:
+            editedSite.website = request.form['website']
         session.add(editedSite)
         session.commit()
         flash('Site Successfully Edited')

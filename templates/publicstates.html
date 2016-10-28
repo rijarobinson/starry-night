@@ -1,11 +1,6 @@
 {% extends "main.html" %}
 {% block content %}
-    <div class="row top-menu">
-        <div class="col-md-10"></div>
-        <div class="col-md-2 text-right">
-            <a href="{{url_for('showLogin')}}">Click Here to Log in </a>
-        </div>
-    </div>
+{% include "header.html" %}
     <div class="row divider blue">
         <div class="col-md-12"></div>
     </div>
@@ -35,19 +30,26 @@
     <div class="row padding-top padding-bottom">
         <div class="col-md-1"></div>
         <div class="col-md-10 padding-none">
-
+            <a href="{{url_for('newSiteNoState')}}">
+                <button class="btn btn-default" id="new-site">
+                    <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
+                </button>
+            </a>
         </div>
         <div class="col-md-1"></div>
     </div>
     {% for state in states %}
+    {{sites}}
+        {% if state.id in sites %}
         <a href = "{{url_for('showSite', state_id = state.id)}}">
             <div class="row">
                 <div class="col-md-1"></div>
-                    <div class="col-md-10 restaurant-list">
+                    <div class="col-md-10 state-list">
                         <h3>{{state.name}}</h3>
                     </div>
                 <div class="col-md-1"></div>
             </div>
         </a>
+        {% endif %}
     {% endfor %}
 {% endblock %}

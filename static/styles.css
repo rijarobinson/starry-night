@@ -116,23 +116,23 @@ h3 {
 .banner h1 {
 	margin: 45px 0;
 }
- .restaurant-list {
+ .state-list {
  	background-color: #F0F0F0;
  	padding: 20px;
-u }
- .restaurant-list:hover {
+}
+
+ .state-list:hover {
  	background-color: #e1e17f;
  	padding: 20px;
 }
-.menu-item {
+
+.site-item {
 	background: #F0F0F0;
 	padding: 20px;
 	margin: 20px;
 	margin-left: -20px;
 }
-.menu-price {
-	font-weight: 700;
-}
+
 .creator {
 	padding-right: 20px;
 	margin-top: -20px;

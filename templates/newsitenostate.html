@@ -20,11 +20,18 @@
 					<div class="input-group">
 						<input type ="text" class="form-control" maxlength="50" name="city" placeholder="City where site is located">
 					</div>
-
+<!--need dropdown to show values form state table, populate state_id and abbrev based upon this-->
 					<label for="state">State:</label>
 					<div class="input-group">
-						{{ state_name }}
-					</div>
+						<select name="state" placeholder="State for site">
+							{% if state_list %}
+								{% for s in state_list %}
+									<option value="{{ s }}">{{ s }}</option>
+								{% endfor %}
+							{% endif %}
+						</select>
+<!--						<input type ="text" class="form-control" maxlength="50" name="city" placeholder="City where site is located">
+					--></div>
 
 					<label for="website">Website:</label>
 					<div class="input-group">

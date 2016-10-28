@@ -47,10 +47,10 @@
     </div>
     <a href="{{url_for('newSite', state_id = state.id )}}">
     <button class="btn btn-default" id="new-menu-item">
-        <span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Add Site
+        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site
     </button>
 </a>
-    {% if sites !=[] %}
+    {% if sites %}
         <div class="row">
             <div class="col-md-1"></div>
             <div class="col-md-3">
@@ -58,7 +58,7 @@
                             <div class="menu-item">
                                 <h3>{{s.name}}</h3>
                                 <p>{{s.city}}</p>
-                                <p class="menu-price">{{s.site_type}}</p>
+                                <p>{{s.site_type}}</p>
                             </div>
                     {% endfor %}
             </div>
