@@ -7,7 +7,7 @@
 	<div class="col-md-6 text-right">
         {% if not currentUserID %}
             <a href="{{url_for('showLogin')}}">
-                Click Here to Log in
+                Click Here to Log in {{currentUserID}}
             </a>
         {% else %}
             <a href="{{url_for('disconnect')}}">

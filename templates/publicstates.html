@@ -30,16 +30,10 @@
     <div class="row padding-top padding-bottom">
         <div class="col-md-1"></div>
         <div class="col-md-10 padding-none">
-            <a href="{{url_for('newSiteNoState')}}">
-                <button class="btn btn-default" id="new-site">
-                    <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
-                </button>
-            </a>
         </div>
         <div class="col-md-1"></div>
     </div>
     {% for state in states %}
-    {{sites}}
         {% if state.id in sites %}
         <a href = "{{url_for('showSite', state_id = state.id)}}">
             <div class="row">

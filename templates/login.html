@@ -1,24 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
+{% extends "main.html" %}
+{% block content %}
 
-  <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
-   <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
-  </script>
+  <div class="row divider blue">
+    <div class="col-md-12"></div>
+  </div>
+  <div class="row banner main">
+    <div class="col-md-1"></div>
+    <div class="col-md-11 padding-none">
+      <h1>Find a Starry Night!</h1>
+    </div>
+  </div>
 
-<script src="//apis.google.com/js/platform.js?onload=start"> </script>
-
-<!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
-
-
-</head>
-
-
-<body>
 
 
 <!-- GOOGLE PLUS SIGN IN-->
-
+<div class="row">
+  <div class = "col-md-12">
+  </div>
+</div>
+<div class = "row">
+  <div class = "col-md-4">
+  </div>
+  <div class = "col-md-4 starry-image text-center ">
+    <div class = "row login-box">
+    </div>
 
           <div id="signInButton">
           <span class="g-signin"
@@ -124,7 +129,7 @@ function sendTokenToServer() {
 }
 
 </script>
-      <div id = 'fb-root'>
+      <div id = 'fb-root text-center'>
 
 
     <button>
@@ -134,7 +139,26 @@ function sendTokenToServer() {
       </a>
       </fb:login-button>
     </button>
-</div>
-</body>
 
-</html>
+
+</div>
+
+<h4>
+    <a href="{{url_for('showStates')}}">
+    <button class="btn btn-default" id="view-info">
+        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Just View the Starry Sites
+    </button>
+</h4>
+</div>
+
+
+<div class = "col-md-4">
+  </div>
+
+
+
+</div>
+
+
+
+{% endblock %}

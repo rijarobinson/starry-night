@@ -5,7 +5,7 @@
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>
-	<div class="row banner menu">
+	<div class="row banner main">
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>Edit Starry Site</h1>
 		</div>
@@ -21,6 +21,22 @@
 					<div class="input-group">
 						<input type ="text" maxlength="50" class="form-control" name="city" value="{{site.city}}">
 					</div>
+
+					<label for="state">State:</label>
+					<div class="input-group">
+						<select name="state" placeholder="State for site">
+							{% if state_list %}
+								{% for s in state_list %}
+									{% if s == state_name %}
+										<option value="{{ s }}" selected>{{ s }}</option>
+									{% else %}
+									<option value="{{ s }}">{{ s }}</option>
+									{% endif %}
+								{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+
 
 					<label for="phone">Phone:</label>
 					<div class="input-group">

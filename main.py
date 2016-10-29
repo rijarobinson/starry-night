@@ -289,13 +289,14 @@ def showStates():
   siteList = []
   for a in allSites:
     siteList.append(a.state_id)
-  currentUserID = login_session['user_id']
-  # Only the administrator is allowed to add states.
-  if currentUserID != 1:
+  try:
+    currentUserID = login_session['user_id']
+    if currentUserID:
+      return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID)
+    else:
+      return render_template('publicstates.html', states = states, sites = siteList)
+  except:
     return render_template('publicstates.html', states = states, sites = siteList)
-  else:
-    return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID)
-
 
 # Need to add functionality that requires user to add a site
 # when adding a state, and also check to make sure they only add
@@ -306,6 +307,7 @@ def showStates():
 def addState():
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
   if request.method == 'POST':
     user_id = login_session['user_id']
     name = request.form['name']
@@ -316,13 +318,14 @@ def addState():
     session.commit()
     return redirect(url_for('showStates'))
   else:
-      return render_template('addState.html')
+      return render_template('addState.html', currentUserID = currentUserID)
 
 #Edit a state
 @app.route('/state/<int:state_id>/edit/', methods = ['GET', 'POST'])
 def editState(state_id):
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
   allowedToEdit = thisStateOwner(login_session['user_id'], state_id)
   if allowedToEdit:
     editedState = session.query(State).filter_by(id = state_id).one()
@@ -334,11 +337,13 @@ def editState(state_id):
           flash('State Successfully Edited %s' % editedState.name)
           return redirect(url_for('showStates'))
     else:
-      return render_template('editState.html', state = editedState)
+      return render_template('editState.html', state = editedState, currentUserID = currentUserID)
   else:
     flash('Only the owner can edit this state. Allowed to edit: %s' % allowedToEdit)
     return redirect('/state/')
 
+
+#Still need to do!!!
 #Delete a state
 # Need to make sure state is not deleted if there are attached
 # sites. Sites must be deleted first (and in the case of multiple
@@ -348,6 +353,7 @@ def editState(state_id):
 def deleteState(state_id):
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
   allowedToDelete = thisStateOwner(login_session['user_id'], state_id)
   if allowedToDelete:
     stateToDelete = session.query(State).filter_by(id = state_id).one()
@@ -355,9 +361,9 @@ def deleteState(state_id):
       session.delete(stateToDelete)
       flash('%s Successfully Deleted' % stateToDelete.name)
       session.commit()
-      return redirect(url_for('showStates', state_id = state_id))
+      return redirect(url_for('showStates', state_id = state_id, currentUserID = currentUserID))
     else:
-      return render_template('deleteState.html', state = stateToDelete)
+      return render_template('deleteState.html', state = stateToDelete, currentUserID = currentUserID)
   else:
     flash('Only the owner can delete this state.')
     return redirect('/state/')
@@ -370,18 +376,23 @@ def showSite(state_id):
   state = session.query(State).filter_by(id = state_id).first()
   sites = session.query(Site).filter_by(state_id = state_id).all()
   creator = ""
-  currentUserID = login_session['user_id']
-  if not currentUserID:
-    return render_template('publicsite.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
-  else:
-    creator = getUserID(login_session['user_id'])
-    return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
+  try:
+    currentUserID = login_session['user_id']
+    if not currentUserID:
+      return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+    else:
+      creator = getUserID(login_session['user_id'])
+      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
+  except:
+    return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+
 
 #Create a new site
 @app.route('/state/<int:state_id>/site/new/', methods=['GET','POST'])
 def newSite(state_id):
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
 #Any logged in user can add a site to a state
   state = session.query(State).filter_by(id = state_id).one()
   state_name = state.name
@@ -397,15 +408,16 @@ def newSite(state_id):
     session.add(newSite)
     session.commit()
     flash('New Site (%s) Successfully Created' % (newSite.name))
-    return redirect(url_for('showSite', state_id = state_id))
+    return redirect(url_for('showSite', state_id = state_id, currentUserID = currentUserID))
   else:
-    return render_template('newsite.html', state_id = state_id, state_name = state_name)
+    return render_template('newsite.html', state_id = state_id, state_name = state_name, currentUserID = currentUserID)
 
 #Create a new site from the state page
 @app.route('/state/site/new/', methods=['GET','POST'])
 def newSiteNoState():
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
 #Any logged in user can add a site
   states = session.query(State).order_by(asc(State.name)).all()
   state_list = []
@@ -426,9 +438,9 @@ def newSiteNoState():
     session.add(newSite)
     session.commit()
     flash('New Site (%s) Successfully Created' % (newSite.name))
-    return redirect(url_for('showSite', state_id = state_link))
+    return redirect(url_for('showSite', state_id = state_link, currentUserID = currentUserID))
   else:
-    return render_template('newsitenostate.html', state_list = state_list)
+    return render_template('newsitenostate.html', state_list = state_list, currentUserID = currentUserID)
 
 
 #Edit a site
@@ -436,11 +448,20 @@ def newSiteNoState():
 def editSite(state_id, site_id):
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
   allowedToEdit = thisSiteOwner(login_session['user_id'], site_id)
   if allowedToEdit:
     editedSite = session.query(Site).filter_by(id = site_id).first()
     state = session.query(State).filter_by(id = state_id).first()
+    states = session.query(State).order_by(asc(State.name)).all()
+    state_name = state.name
+    state_list = []
+    for state in states:
+      state_list.append(state.name)
     if request.method == 'POST':
+        state_name = request.form['state']
+        state = session.query(State).filter_by(name = state_name).first()
+        state_link = state.id
         if request.form['name']:
             editedSite.name = request.form['name']
         if request.form['notes']:
@@ -449,6 +470,8 @@ def editSite(state_id, site_id):
             editedSite.site_type = request.form['site_type']
         if request.form['city']:
             editedSite.city = request.form['city']
+        if request.form['state']:
+            editedSite.state_id = state_link
         if request.form['phone']:
             editedSite.phone = request.form['phone']
         if request.form['website']:
@@ -458,7 +481,7 @@ def editSite(state_id, site_id):
         flash('Site Successfully Edited')
         return redirect('/state/%s/site/' % state_id)
     else:
-        return render_template('editSite.html', state_id = state_id, site_id = site_id, site = editedSite)
+        return render_template('editSite.html', state_id = state_id, site_id = site_id, site = editedSite, state_name = state_name, state_list = state_list, currentUserID = currentUserID)
   else:
     flash('Only the owner can edit this site. Allowed to edit: %s' % allowedToEdit)
     return redirect('/state/%s/site/' % state_id)
@@ -469,6 +492,7 @@ def editSite(state_id, site_id):
 def deleteSite(state_id, site_id):
   if 'username' not in login_session:
     return redirect('/login')
+  currentUserID = login_session['user_id']
   allowedToDelete = thisSiteOwner(login_session['user_id'], site_id)
   if allowedToDelete:
     state = session.query(State).filter_by(id = state_id).one()
@@ -479,7 +503,7 @@ def deleteSite(state_id, site_id):
         flash('Viewing Site Successfully Deleted')
         return redirect(url_for('showSite', state_id = state_id))
     else:
-        return render_template('deleteSite.html', site = siteToDelete)
+        return render_template('deleteSite.html', site = siteToDelete, currentUserID = currentUserID)
   else:
     flash('Only the owner can delete this site. Allowed to edit: %s' % allowedToDelete)
     return redirect('/state/%s/site/' % state_id)

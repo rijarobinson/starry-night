@@ -4,31 +4,27 @@
 	<div class="row divider green">
 		<div class="col-md-12"></div>
 	</div>
-	<div class="row banner menu">
+	<div class="row banner main">
 		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>{{ state.name }} - privilege menu
-<!--no. maybe do a png of state shape			<figure class="creator">
-				<img src="{{ url_for('static', filename='blank_user.gif') }}">
-				<figcaption></figcaption>
-			</figure>-->
+			<h1>{{ state.name }} - privilege page
 			</h1>
-
 		</div>
 	</div>
-
-<div class = 'flash'>
+<div class = "row">
+	<div class = "col-md-12">
+		<div class = "flash">
 		      {% with messages = get_flashed_messages() %}
-      {% if messages %}
-
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-    {% endwith %}
-
-</div>
+      			{% if messages %}
+			        <ul>
+        				{% for message in messages %}
+            				<li><strong>{{ message }}</strong></li>
+				        {% endfor %}
+        			</ul>
+        		{% endif %}
+    			{% endwith %}
+			</div>
+		</div>
+	</div>
 	<div class="row padding-top padding-bottom">
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
@@ -58,6 +54,11 @@
 							<div class="site-item">
 								<h3>{{s.name}} - {{s.id}} - {{s.user_id}} - {{currentUserID}}</h3>
 								<p>{{s.city}}</p>
+								<p>{{state.name}}</p>
+								<p>{{s.phone}}</p>
+								<p>{{s.website}}</p>
+								<p>{{s.notes}}</p>
+								<div class = "site-display">{{s.site_type}}</div>
 								{% if s.user_id == currentUserID %}
 								<a href='{{url_for('editSite', state_id = state.id, site_id=s.id ) }}'>Edit</a> |
 								<a href='{{url_for('deleteSite', state_id = state.id, site_id=s.id ) }}'>Delete</a>
