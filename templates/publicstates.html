@@ -89,15 +89,15 @@
             console.log("mapNo:" + mapNo);
             var address = "Ellison Bay WI";
             var uluru = {lat: -25.363, lng: 131.044};
-                /*geocoder.geocode( { 'address': address }, function(results, status) {
+                geocoder.geocode( { 'address': address }, function(results, status) {
                     var addr_type = results[0].types[0];
                     if ( status == google.maps.GeocoderStatus.OK ) {
-                        console.log(results[0].geometry.location);
+                        console.log(results[0].geometry.location + "");
                     }
                     else {
                         alert("Geocode was not successful for the following reason: " + status);
                     }
-            });*/
+            });
             var map = new google.maps.Map(document.getElementById("map" + mapNo), {
                     zoom: 4,
                     center: uluru
