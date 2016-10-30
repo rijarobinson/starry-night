@@ -81,32 +81,38 @@
 </script>
         <script>
         function initMap() {
-            mapNo = 1;
-                var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
-
-
+            mapNo = 0;
+            var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
             {% for site in sites %}
             console.log("mapNo:" + mapNo);
-            var address = "Ellison Bay WI";
-            var uluru = {lat: -25.363, lng: 131.044};
+            var address = "{{ site.name }} {{ site.city }} wi";
                 geocoder.geocode( { 'address': address }, function(results, status) {
                     var addr_type = results[0].types[0];
                     if ( status == google.maps.GeocoderStatus.OK ) {
-                        console.log(results[0].geometry.location + "");
-                    }
-                    else {
-                        alert("Geocode was not successful for the following reason: " + status);
-                    }
-            });
-            var map = new google.maps.Map(document.getElementById("map" + mapNo), {
-                    zoom: 4,
-                    center: uluru
+                        var latLon = results[0].geometry.location + "";
+                        var latLon = latLon.toString().replace("(","");
+                        var latLon = latLon.replace(")","");
+                        var splitLatLon = latLon.split(",");
+                        var lat = Number(splitLatLon[0]);
+                        var lon = Number(splitLatLon[1]);
+                        var uluru = {lat: lat, lng: lon};
+                        console.log(uluru);
+                        console.log("map" + mapNo);
+                        var map = new google.maps.Map(document.getElementById("map" + mapNo), {
+                            zoom: 4,
+                            center: uluru
                 })
                 console.log(mapNo);
                 var marker = new google.maps.Marker({
                             map: map,
                             position: uluru
                         });
+
+                    }
+                    else {
+                        alert("Geocode was not successful for the following reason: " + status);
+                    }
+});
             mapNo = mapNo + 1;
             {% endfor %}
 }
