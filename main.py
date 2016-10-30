@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect,jsonify, url_for, flash
 app = Flask(__name__)
 
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, State, Site, User
 
@@ -32,7 +32,7 @@ def showLogin():
   state = ''.join(random.choice(string.ascii_uppercase + string.digits)
     for x in xrange(32))
   login_session['state'] = state
-  return render_template('login.html', STATE=state)
+  return render_template('login.html', STATE=state, result = "")
 
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -116,14 +116,13 @@ def gconnect():
     userInfo = getUserInfo(userIDInDB)
     verifyUserData = userInfo.email + " " + userInfo.name + " " + str(userInfo.id)
 
-    output = ''
-    output += '<h1>Welcome, '
+    output = '<div class = "row"><div class = "col-md-12 text-center"'
+    output += '<h3>Welcome, '
     output += login_session['username']
-    output += '!</h1>'
+    output += '!</h3>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
-    output += '<br>Your user info is: <b>%s</b>' % verifyUserData
+    output += ' " style = "width: 50px; height: 50px; border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"></div></div>'
     flash("You are now logged in as %s" % login_session['username'])
     print "done!"
     return output
@@ -217,14 +216,14 @@ def fbconnect():
         user_id = createUser(login_session)
     login_session['user_id'] = user_id
 
-    output = ''
-    output += '<h1>Welcome, '
+    output = '<div class = "row"><div class = "col-md-12 text-center"'
+    output += '<h3>Welcome, '
     output += login_session['username']
 
-    output += '!</h1>'
+    output += '!</h3>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ' " style = "width: 50px; height: 50px;border-radius: 25px;-webkit-border-radius: 25px;-moz-border-radius: 25px;"></div></div>'
 
     flash("Now logged in as %s" % login_session['username'])
     return output
@@ -284,19 +283,19 @@ def statesJSON():
 @app.route('/')
 @app.route('/state/')
 def showStates():
-  states = session.query(State).order_by(asc(State.name))
-  allSites = session.query(Site).order_by(asc(Site.name))
+  states = session.query(State).order_by(asc(State.name)).all()
+  allSites = session.query(Site).order_by(desc(Site.id)).limit(5).all()
   siteList = []
   for a in allSites:
     siteList.append(a.state_id)
   try:
     currentUserID = login_session['user_id']
     if currentUserID:
-      return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID)
+      return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID, allSites = allSites)
     else:
-      return render_template('publicstates.html', states = states, sites = siteList)
+      return render_template('publicstates.html', states = states, sites = siteList, allSites = allSites)
   except:
-    return render_template('publicstates.html', states = states, sites = siteList)
+    return render_template('publicstates.html', states = states, sites = siteList, allSites = allSites)
 
 # Need to add functionality that requires user to add a site
 # when adding a state, and also check to make sure they only add

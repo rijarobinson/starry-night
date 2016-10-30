@@ -25,25 +25,95 @@
 
 </div>
 
-
-
     <div class="row padding-top padding-bottom">
         <div class="col-md-1"></div>
         <div class="col-md-10 padding-none">
         </div>
         <div class="col-md-1"></div>
     </div>
-    {% for state in states %}
-        {% if state.id in sites %}
-        <a href = "{{url_for('showSite', state_id = state.id)}}">
+
+    <div class = "row">
+        <div class = "col-md-1"></div>
+        <div class = "col-md-4">
+            <h2>States that have sites listed</h2>
+        </div>
+        <div class = "col-md-5">
+            <h2>Newest Sites Added!</h2>
+        </div>
+        <div class = "col-md-1"></div>
+
+    </div>
+
+
             <div class="row">
                 <div class="col-md-1"></div>
-                    <div class="col-md-10 state-list">
+                    <div class="col-md-4">
+        {% for state in states %}
+        {% if state.id in sites %}
+        <a href = "{{url_for('showSite', state_id = state.id)}}">
+        <div class="state-list">
                         <h3>{{state.name}}</h3>
                     </div>
-                <div class="col-md-1"></div>
-            </div>
+
         </a>
         {% endif %}
     {% endfor %}
+                <div class="col-md-1"></div>
+
+                    </div>
+                    <div class = "col-md-4">
+{% set mapNo = 1 %}
+        {% for site in allSites %}
+        <!--make these links go to an individual site page, e.g. showSingleSite-->
+        <a href = "{{url_for('showSite', state_id = site.state_id)}}">
+            <div class="state-list">
+                        <h5>{{ site.name }}</h5>
+                        <div class = "plain-text">{{ site.city }}, {{ site.state.abbrev }}</div>
+                    </div>
+            </a>
+            <div id="map{{mapNo}}" style="height: 200px; width: 100%;">
+</div>mapNo: {{ mapNo }}
+
+        {% set mapNo = mapNo + 1 %}
+        {% endfor %}
+
+<script>
+</script>
+        <script>
+        function initMap() {
+            mapNo = 1;
+                var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
+
+
+            {% for site in sites %}
+            console.log("mapNo:" + mapNo);
+            var address = "Ellison Bay WI";
+            var uluru = {lat: -25.363, lng: 131.044};
+                /*geocoder.geocode( { 'address': address }, function(results, status) {
+                    var addr_type = results[0].types[0];
+                    if ( status == google.maps.GeocoderStatus.OK ) {
+                        console.log(results[0].geometry.location);
+                    }
+                    else {
+                        alert("Geocode was not successful for the following reason: " + status);
+                    }
+            });*/
+            var map = new google.maps.Map(document.getElementById("map" + mapNo), {
+                    zoom: 4,
+                    center: uluru
+                })
+                console.log(mapNo);
+                var marker = new google.maps.Marker({
+                            map: map,
+                            position: uluru
+                        });
+            mapNo = mapNo + 1;
+            {% endfor %}
+}
+        </script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGlGZ5rJOgFVxkz8biOVu0Ni6LmVyEddQ&callback=initMap">
+        </script>
+
+</div>
+
 {% endblock %}
