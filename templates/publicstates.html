@@ -57,12 +57,12 @@
 
         </a>
         {% endif %}
-    {% endfor %}
+        {% endfor %}
                 <div class="col-md-1"></div>
 
                     </div>
                     <div class = "col-md-4">
-{% set mapNo = 1 %}
+        {% set mapNo = 1 %}
         {% for site in allSites %}
         <!--make these links go to an individual site page, e.g. showSingleSite-->
         <a href = "{{url_for('showSite', state_id = site.state_id)}}">
@@ -75,34 +75,55 @@
 </div>mapNo: {{ mapNo }}
 
         {% set mapNo = mapNo + 1 %}
+
         {% endfor %}
 
-<script>
-</script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGlGZ5rJOgFVxkz8biOVu0Ni6LmVyEddQ&callback=initMap">
+        </script>
+
+
         <script>
         function initMap() {
             mapNo = 0;
             var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
-            {% for site in sites %}
-            console.log("mapNo:" + mapNo);
-            var address = "{{ site.name }} {{ site.city }} wi";
-                geocoder.geocode( { 'address': address }, function(results, status) {
-                    var addr_type = results[0].types[0];
-                    if ( status == google.maps.GeocoderStatus.OK ) {
-                        var latLon = results[0].geometry.location + "";
-                        var latLon = latLon.toString().replace("(","");
-                        var latLon = latLon.replace(")","");
-                        var splitLatLon = latLon.split(",");
-                        var lat = Number(splitLatLon[0]);
-                        var lon = Number(splitLatLon[1]);
-                        var uluru = {lat: lat, lng: lon};
-                        console.log(uluru);
-                        console.log("map" + mapNo);
-                        var map = new google.maps.Map(document.getElementById("map" + mapNo), {
-                            zoom: 4,
-                            center: uluru
+
+            {% for j in jsSites %}
+            console.log("before geocoder: mapNo:" + mapNo);
+
+            /* trying to dynamically get the state id for the site to display the map correctly
+            var stateID = 46;
+            console.log(stateID);
+            var stateAbbrev = "";
+            {% for a in jsStates %}
+                if (stateID == {{a.id}}) {
+                    stateAbbrev = "WI";
+                }
+            {% endfor %}
+            */
+
+            var address = "{{j.name}} {{j.city}} " + stateAbbrev;
+            console.log("address: " + address);
+            geocoder.geocode( { 'address': address }, function(results, status) {
+                var addr_type = results[0].types[0];
+                if ( status == google.maps.GeocoderStatus.OK ) {
+                    console.log("right after status ok: map" + mapNo);
+                    var latLon = results[0].geometry.location + "";
+                    var latLon = latLon.toString().replace("(","");
+                    var latLon = latLon.replace(")","");
+                    var splitLatLon = latLon.split(",");
+                    var lat = Number(splitLatLon[0]);
+                    var lon = Number(splitLatLon[1]);
+                    var uluru = {lat: lat, lng: lon};
+                    console.log(uluru);
+                    console.log("after uluru assigned: map" + mapNo);
+                    {% endfor %}
+                    var mapNo = 1;
+                    {% for site in sites %}
+                    var map = new google.maps.Map(document.getElementById("map" + mapNo), {
+                        zoom: 4,
+                        center: uluru
                 })
-                console.log(mapNo);
+                console.log("after get elementID: " + mapNo);
                 var marker = new google.maps.Marker({
                             map: map,
                             position: uluru
@@ -114,10 +135,9 @@
                     }
 });
             mapNo = mapNo + 1;
+            console.log("End for loop-map" + mapNo);
             {% endfor %}
 }
-        </script>
-        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGlGZ5rJOgFVxkz8biOVu0Ni6LmVyEddQ&callback=initMap">
         </script>
 
 </div>
