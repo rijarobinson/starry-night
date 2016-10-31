@@ -288,11 +288,10 @@ def showStates():
   siteList = []
   for a in allSites:
     siteList.append(a.state_id)
-
   try:
     currentUserID = login_session['user_id']
     if currentUserID:
-      return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID, allSites = allSites)
+      return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states])
     else:
       return render_template('publicstates.html', states = states, sites = siteList, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states])
   except:
