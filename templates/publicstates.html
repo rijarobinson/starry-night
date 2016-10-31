@@ -86,25 +86,25 @@
         function initMap() {
             mapNo = 0;
             var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
+   /*         console.log("jsSites: {{jsSites}}") */
 
             {% for j in jsSites %}
             console.log("before geocoder: mapNo:" + mapNo);
-
-            /* trying to dynamically get the state id for the site to display the map correctly
-            var stateID = 46;
+            /* trying to dynamically get the state id for the site to display the map correctly*/
+            var stateID = {{j.state_id}};
             console.log(stateID);
             var stateAbbrev = "";
+  /*          console.log("jsStates: " + "{{jsStates}}");*/
             {% for a in jsStates %}
                 if (stateID == {{a.id}}) {
-                    stateAbbrev = "WI";
+                    stateAbbrev = "{{a.abbrev}}";
                 }
             {% endfor %}
-            */
+
 
             var address = "{{j.name}} {{j.city}} " + stateAbbrev;
             console.log("address: " + address);
             geocoder.geocode( { 'address': address }, function(results, status) {
-                var addr_type = results[0].types[0];
                 if ( status == google.maps.GeocoderStatus.OK ) {
                     console.log("right after status ok: map" + mapNo);
                     var latLon = results[0].geometry.location + "";
