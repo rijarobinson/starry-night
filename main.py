@@ -371,28 +371,28 @@ def showSite(state_id):
   try:
     currentUserID = login_session['user_id']
     if not currentUserID:
-      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "")
+      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "", jsSites = [s.serialize for s in sites], jsStates = [state.serialize])
     else:
       creator = getUserID(login_session['user_id'])
-      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
+      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID, jsSites = [s.serialize for s in sites], jsStates = [state.serialize])
   except:
-    return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "")
+    return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "", jsSites = [s.serialize for s in sites], jsStates = [state.serialize])
 
 
 @app.route('/state/<int:state_id>/site/<int:site_id>/', methods=['GET','POST'])
 def showSingleSite(state_id, site_id):
   state = session.query(State).filter_by(id = state_id).first()
-  sites = session.query(Site).filter_by(state_id = state_id).all()
+  site = session.query(Site).filter_by(id = site_id).first()
   creator = ""
   try:
     currentUserID = login_session['user_id']
     if not currentUserID:
-      return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = "")
+      return render_template('singleSite.html', site = site, state = state, creator = creator, currentUserID = "", jsSites = [site.serialize], jsStates = [state.serialize])
     else:
       creator = getUserID(login_session['user_id'])
-      return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
+      return render_template('singleSite.html', site = site, state = state, creator = creator, currentUserID = currentUserID, jsSites = [site.serialize], jsStates = [state.serialize])
   except:
-    return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = "")
+    return render_template('singleSite.html', site = site, state = state, creator = creator, currentUserID = "", jsSites = [site.serialize], jsStates = [state.serialize])
 
 
 #Create a new site

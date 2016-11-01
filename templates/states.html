@@ -37,7 +37,23 @@
 			</a>
 
 		</div>
-		{% endif %}
+				<div class="col-md-1"></div>
+		<div class="col-md-1">
+			<a href="{{url_for('newSiteNoState')}}">
+				<button class="btn btn-default" id="new-site">
+					<span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
+				</button>
+			</a>
+		</div>
+	</div>
+
+		{% elif not currentUserID %}
+					    <a href="{{url_for('showLogin')}}">
+    <button class="btn btn-default" id="login">
+        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Log In to Add Site
+    </button>
+</a>
+{% else %}
 		<div class="col-md-1"></div>
 		<div class="col-md-1">
 			<a href="{{url_for('newSiteNoState')}}">
@@ -47,6 +63,8 @@
 			</a>
 		</div>
 	</div>
+
+		{% endif %}
 
 
 
@@ -80,9 +98,8 @@
         <div class = "col-md-5">
             <h2>Newest Sites Added!</h2>
             <!--TODO: get dynamic value for starting mapNo in case decide to change recently added list-->
-            {% set mapNo = 4 %}
+            {% set mapNo = sites|length -1 %}
             {% for site in allSites %}
-                <!--make these links go to an individual site page, e.g. showSingleSite-->
                 <a href = "{{url_for('showSingleSite', state_id = site.state_id, site_id = site.id)}}">
                     <div class="state-list">
                         <h5>{{ site.name }}</h5>
@@ -100,11 +117,9 @@
     </script>
     <script>
         function initMap() {
-            mapDivNo = 0;
             var geocoder = new google.maps.Geocoder();    // instantiate a geocoder object
             /*         console.log("jsSites: {{jsSites}}") */
             {% for j in jsSites %}
-                // console.log("FIRST LINE BEFORE GET MAP-before geocoder: mapDivNo:" + mapDivNo);
                 /* trying to dynamically get the state id for the site to display the map correctly*/
                 var stateID = {{j.state_id}};
                 // console.log(stateID);
@@ -119,7 +134,6 @@
                 // console.log("address: " + address);
                 geocoder.geocode( { 'address': address }, function(results, status) {
                 if ( status == google.maps.GeocoderStatus.OK ) {
-                    // console.log("right after status ok: map" + mapDivNo);
                     var latLon = results[0].geometry.location + "";
                     var latLon = latLon.toString().replace("(","");
                     var latLon = latLon.replace(")","");
@@ -128,11 +142,9 @@
                     var lon = Number(splitLatLon[1]);
                     var uluru = {lat: lat, lng: lon};
                     // console.log(uluru);
-                    // console.log("after uluru assigned: map" + mapDivNo);
 
             {% endfor %}
-            /*TODO: remove hardcoded values and try to figure out how to get the length of json object*/
-            {% for x in range(0,5) %}
+            {% for x in range(0,jsSites|length) %}
                     var map = new google.maps.Map(document.getElementById("map{{x}}"), {
                               zoom: 5,
                               center: uluru
@@ -149,8 +161,6 @@
             });
 
             {% endfor %}
-            mapDivNo = mapDivNo + 1;
-        /*    console.log("End for loop-map" + mapDivNo);*/
         }
     </script>
 {% endblock %}
