@@ -386,6 +386,22 @@ def showSite(state_id):
     return render_template('publicsite.html', sites = sites, state = state, creator = creator)
 
 
+@app.route('/state/<int:state_id>/site/<int:site_id>/', methods=['GET','POST'])
+def showSingleSite(state_id, site_id):
+  state = session.query(State).filter_by(id = state_id).first()
+  sites = session.query(Site).filter_by(state_id = state_id).all()
+  creator = ""
+  try:
+    currentUserID = login_session['user_id']
+    if not currentUserID:
+      return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = "")
+    else:
+      creator = getUserID(login_session['user_id'])
+      return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
+  except:
+    return render_template('singleSite.html', sites = sites, state = state, creator = creator, currentUserID = "")
+
+
 #Create a new site
 @app.route('/state/<int:state_id>/site/new/', methods=['GET','POST'])
 def newSite(state_id):

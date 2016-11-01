@@ -51,14 +51,17 @@
 			<div class="col-md-1"></div>
 			<div class="col-md-3">
 					{% for s in sites %}
+					<a href = "{{url_for('showSingleSite', state_id = site.state_id, site_id = s.id)}}">
 							<div class="site-item">
-								<h3>{{s.name}} - {{s.id}} - {{s.user_id}} - {{currentUserID}}</h3>
+								<h3>{{s.name}} - {{s.id}} - {{s.user_id}} - {{currentUserID}} - {{state_id}}</h3>
 								<p>{{s.city}}</p>
 								<p>{{state.name}}</p>
 								<p>{{s.phone}}</p>
 								<p>{{s.website}}</p>
 								<p>{{s.notes}}</p>
+
 								<div class = "site-display">{{s.site_type}}</div>
+					</a>
 								{% if s.user_id == currentUserID %}
 								<a href='{{url_for('editSite', state_id = state.id, site_id=s.id ) }}'>Edit</a> |
 								<a href='{{url_for('deleteSite', state_id = state.id, site_id=s.id ) }}'>Delete</a>
