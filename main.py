@@ -14,8 +14,6 @@ import httplib2
 import json
 from flask import make_response
 import requests
-# if i decide to store some or all functions separately
-import starry_lib
 
 CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
@@ -190,8 +188,6 @@ def fbconnect():
     url = 'https://graph.facebook.com/v2.4/me?%s&fields=name,id,email' % token
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    # print "url sent for API access:%s"% url
-    # print "API JSON result: %s" % result
     data = json.loads(result)
     login_session['provider'] = 'facebook'
     login_session['username'] = data["name"]
@@ -293,15 +289,11 @@ def showStates():
     if currentUserID:
       return render_template('states.html', states = states, sites = siteList, currentUserID = currentUserID, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states])
     else:
-      return render_template('publicstates.html', states = states, sites = siteList, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states])
+      return render_template('states.html', states = states, sites = siteList, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states], currentUserID = "")
   except:
-    return render_template('publicstates.html', states = states, sites = siteList, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states])
+    return render_template('states.html', states = states, sites = siteList, allSites = allSites, jsSites = [s.serialize for s in allSites], jsStates = [s.serialize for s in states], currentUserID = "")
 
-# Need to add functionality that requires user to add a site
-# when adding a state, and also check to make sure they only add
-# states that haven't been added, maybe a notice or shut down
-# when all states are added
-#Add a new state--cannot add a state without also adding a site
+# only Administrator can add new states
 @app.route('/state/new/', methods=['GET','POST'])
 def addState():
   if 'username' not in login_session:
@@ -342,33 +334,34 @@ def editState(state_id):
     return redirect('/state/')
 
 
-#Still need to do!!!
-#Delete a state
-# Need to make sure state is not deleted if there are attached
-# sites. Sites must be deleted first (and in the case of multiple
-  #people adding sites, can only delete your sites, cannot delete state
-  # if there are other people's sites attached).
+# Delete a state
+# Administrator only can delete/edit states. States cannot be deleted if there are sites
+# related to the state.
 @app.route('/state/<int:state_id>/delete/', methods = ['GET','POST'])
 def deleteState(state_id):
   if 'username' not in login_session:
     return redirect('/login')
   currentUserID = login_session['user_id']
   allowedToDelete = thisStateOwner(login_session['user_id'], state_id)
-  if allowedToDelete:
-    stateToDelete = session.query(State).filter_by(id = state_id).one()
-    if request.method == 'POST':
-      session.delete(stateToDelete)
-      flash('%s Successfully Deleted' % stateToDelete.name)
-      session.commit()
-      return redirect(url_for('showStates', state_id = state_id, currentUserID = currentUserID))
-    else:
-      return render_template('deleteState.html', state = stateToDelete, currentUserID = currentUserID)
-  else:
-    flash('Only the owner can delete this state.')
+  if stateHasSites(state_id):
+    flash('The state has sites attached to it. Please remove sites before deleting the state info.')
     return redirect('/state/')
+  else:
+    if allowedToDelete:
+      stateToDelete = session.query(State).filter_by(id = state_id).one()
+      if request.method == 'POST':
+        session.delete(stateToDelete)
+        flash('%s Successfully Deleted' % stateToDelete.name)
+        session.commit()
+        return redirect(url_for('showStates', state_id = state_id, currentUserID = currentUserID))
+      else:
+        return render_template('deleteState.html', state = stateToDelete, currentUserID = currentUserID)
+    else:
+      flash('Only the owner can delete this state.')
+      return redirect('/state/')
 
-#Show a state's sites
-#Anybody can add a site
+# Show a state's sites
+# Anybody can add a site
 @app.route('/state/<int:state_id>/')
 @app.route('/state/<int:state_id>/site/')
 def showSite(state_id):
@@ -378,12 +371,12 @@ def showSite(state_id):
   try:
     currentUserID = login_session['user_id']
     if not currentUserID:
-      return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+      return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "")
     else:
       creator = getUserID(login_session['user_id'])
       return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = currentUserID)
   except:
-    return render_template('publicsite.html', sites = sites, state = state, creator = creator)
+    return render_template('site.html', sites = sites, state = state, creator = creator, currentUserID = "")
 
 
 @app.route('/state/<int:state_id>/site/<int:site_id>/', methods=['GET','POST'])
@@ -569,6 +562,13 @@ def thisSiteOwner(user_id, site_id):
       return True
     else:
       return False
+  except:
+    None
+
+def stateHasSites(state_id):
+  try:
+    hasSites = session.query(Site).filter_by(state_id = state_id).one()
+    return hasSites
   except:
     None
 
