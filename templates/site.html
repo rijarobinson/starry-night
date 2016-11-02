@@ -57,28 +57,34 @@
 
 		</div>
 	</div>
-
+    <!--TODO: enhancement, add trip advisor reviews for sites, maybe add address field for more accuracy-->
 	{% if sites %}
 	            {% set mapNo = sites|length - 1 %}
 					{% for s in sites %}
-<div class="row">
+<div class="row site-item">
 	<div class="col-md-1"></div>
-	<div class="col-md-10 site-item">
+ 	<div class="col-md-5">
 			<a href = "{{url_for('showSingleSite', state_id = s.state_id, site_id = s.id)}}">
 				<h3>{{s.name}}</h3>
 			</a>
-				<p>{{s.city}}</p>
-				<p>{{state.name}}</p>
-				<p>{{s.phone}}</p>
-				<p>{{s.website}}</p>
+				<p><span class = "text-right">Location: </span>{{s.city}}, {{state.name}}</p>
+                {% if s.phone %}
+				<p><span class = "text-right">Phone:</span>{{s.phone}}</p>
+                {% endif %}
+                {% if s.website %}
+				<p><span class = "text-right">Website:</span>{{s.website}}</p>
+                {% endif %}
+                {% if s.notes %}
 				<p>{{s.notes}}</p>
-				<div class = "site-display">{{s.site_type}}</div>
+                {% endif %}
+				<div class = "site-display">Site Type: {{s.site_type}}</div>
 				{% if s.user_id == currentUserID %}
 					<a href='{{url_for('editSite', state_id = state.id, site_id=s.id ) }}'>Edit</a> |
 					<a href='{{url_for('deleteSite', state_id = state.id, site_id=s.id ) }}'>Delete</a>
 				{% endif %}
-
-		<div id="map{{mapNo}}" style="height: 200px; width: 100%;"></div>
+            </div>
+<div class = "col-md-5 text-right">
+		<div id="map{{mapNo}}" style="height: 200px; width: 100%;">Please connect to internet to view map</div>
 	</div><div class="col-md-1"></div>
 </div>
 	{% set mapNo = mapNo - 1 %}

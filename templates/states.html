@@ -7,7 +7,7 @@
 	<div class="row banner main">
 		<div class="col-md-1"></div>
 		<div class="col-md-11 padding-none">
-			<h1>Find a Starry Night!-You are a logged in user</h1>
+			<h1>Find a Starry Night!</h1>
 		</div>
 	</div>
 
@@ -25,53 +25,9 @@
 
 </div>
 
-	<div class="row padding-top padding-bottom">
-			{% if currentUserID == 1 %}
-		<div class="col-md-1"></div>
-					<div class="col-md-1 padding-none">
-
-			<a href="{{url_for('addState')}}">
-				<button class="btn btn-default" id="new-state">
-					<span class="glyphicon glyphicon-star" aria-hidden="true"></span>Add New State
-				</button>
-			</a>
-
-		</div>
-				<div class="col-md-1"></div>
-		<div class="col-md-1">
-			<a href="{{url_for('newSiteNoState')}}">
-				<button class="btn btn-default" id="new-site">
-					<span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
-				</button>
-			</a>
-		</div>
-	</div>
-
-		{% elif not currentUserID %}
-					    <a href="{{url_for('showLogin')}}">
-    <button class="btn btn-default" id="login">
-        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Log In to Add Site
-    </button>
-</a>
-{% else %}
-		<div class="col-md-1"></div>
-		<div class="col-md-1">
-			<a href="{{url_for('newSiteNoState')}}">
-				<button class="btn btn-default" id="new-site">
-					<span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
-				</button>
-			</a>
-		</div>
-	</div>
-
-		{% endif %}
-
-
-
 
     <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-md-5">
+        <div class="col-md-6">
             <h2>States that have sites listed</h2>
             {% for state in states %}
                 {% if state.id in sites %}
@@ -93,9 +49,38 @@
                     </a>
                 {% endif %}
             {% endfor %}
+            <div class = "padding-top">
+            {% if currentUserID == 1 %}
+
+            <a href="{{url_for('addState')}}">
+                <button class="btn btn-default padding-top" id="new-state">
+                    <span class="glyphicon glyphicon-star" aria-hidden="true"></span>Add New State
+                </button>
+            </a>
+
+            <a href="{{url_for('newSiteNoState')}}">
+                <button class="btn btn-default padding-top" id="new-site">
+                    <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
+                </button>
+            </a>
+
+        {% elif not currentUserID %}
+                        <a href="{{url_for('showLogin')}}">
+    <button class="btn btn-default padding-top" id="login">
+        <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Log In to Add Site
+    </button>
+</a>
+{% else %}
+            <a href="{{url_for('newSiteNoState')}}">
+                <button class="btn btn-default padding-top" id="new-site">
+                    <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Add Site to State Not Listed Here
+                </button>
+            </a>
+
+        {% endif %}
+    </div>
         </div>
-        <div class="col-md-1"></div>
-        <div class = "col-md-5">
+        <div class = "col-md-6">
             <h2>Newest Sites Added!</h2>
             <!--TODO: get dynamic value for starting mapNo in case decide to change recently added list-->
             {% set mapNo = sites|length -1 %}
@@ -106,11 +91,13 @@
                         <div class = "plain-text">{{ site.city }}, {{ site.state.abbrev }}</div>
                     </div>
                 </a>
-                <div id="map{{mapNo}}" style="height: 150px; width: 100%;"></div>
+                <div id="map{{mapNo}}" style="height: 150px; width: 100%;">Please connect to internet to view map</div>
                 {% set mapNo = mapNo - 1 %}
             {% endfor %}
         </div>
     </div>
+
+
 
     <!--need to really spend some time trying to understand this, especially how things are stepped through-->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGlGZ5rJOgFVxkz8biOVu0Ni6LmVyEddQ&callback=initMap">
