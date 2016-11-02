@@ -82,7 +82,6 @@
         </div>
         <div class = "col-md-6">
             <h2>Newest Sites Added!</h2>
-            <!--TODO: get dynamic value for starting mapNo in case decide to change recently added list-->
             {% set mapNo = sites|length -1 %}
             {% for site in allSites %}
                 <a href = "{{url_for('showSingleSite', state_id = site.state_id, site_id = site.id)}}">

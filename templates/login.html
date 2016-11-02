@@ -43,8 +43,12 @@
 function signInCallback(authResult) {
   if (authResult['code']) {
 
-    // Hide the sign-in button now that the user is authorized
-    $('#signinButton').attr('style', 'display: none');
+    // Hide the sign-in buttons now that the user is authorized
+    $('#signInButton').attr('style', 'display: none');
+    $('#fbSignInButton').attr('style', 'display: none');
+    $('#nonSignInButton').attr('style', 'display: none');
+
+
 
     // Send the one-time-use code to the server, if the server responds, write a 'login successful' message to the web page and then redirect back to the main states page
     $.ajax({
@@ -56,7 +60,7 @@ function signInCallback(authResult) {
       success: function(result) {
         // Handle or verify the server response if necessary.
         if (result) {
-          $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+          $('#result').html('<h3>Login Successful!</br>' + result + '</h3></br><h3>Sending you to main page...</h3>')
          setTimeout(function() {
           window.location.href = "/state";
          }, 4000);
@@ -101,10 +105,11 @@ function signInCallback(authResult) {
 
 function sendTokenToServer() {
   var access_token = FB.getAuthResponse()['accessToken'];
-  console.log('Welcome! Fetching your Facebook account info.');
-  console.log(access_token)
+        // Hide sign-in buttons
+        $('#signInButton').attr('style', 'display: none');
+        $('#fbSignInButton').attr('style', 'display: none');
+        $('#nonSignInButton').attr('style', 'display: none');
   FB.api('/me', function(response) {
-    console.log('Successful login for: ' + response.name);
     $.ajax({
     type: 'POST',
     url: '/fbconnect?state={{STATE}}',
@@ -112,9 +117,9 @@ function sendTokenToServer() {
     data: access_token,
     contentType: 'application/octet-stream; charset=utf-8',
     success: function(result) {
-      //Handle or verify the server response if necessary
+          //Handle or verify the server response if necessary
       if (result) {
-        $('#result').html('Login Successful!</br>' + result + '</br>Redirecting...')
+        $('#result').html('<h3>Login Successful!</br>' + result + '</h3></br><h3>Sending you to main page...</h3>')
         setTimeout(function() {
           window.location.href = '/state';
         }, 4000);
@@ -129,6 +134,8 @@ function sendTokenToServer() {
 }
 
 </script>
+          <div id="fbSignInButton">
+
       <div id = 'fb-root text-center'>
 
 
@@ -142,6 +149,8 @@ function sendTokenToServer() {
 
 
 </div>
+</div>
+          <div id="nonSignInButton">
 
 <h4>
     <a href="{{url_for('showStates')}}">
@@ -149,6 +158,7 @@ function sendTokenToServer() {
         <span class="glyphicon glyphicon-tree-conifer" aria-hidden="true"></span>Just View the Starry Sites
     </button>
 </h4>
+</div>
 </div>
 
 

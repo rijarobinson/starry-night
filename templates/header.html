@@ -4,14 +4,14 @@
 			<span class="glyphicon glyphicon-home" aria-hidden="true"></span>Show All States
 		</a>
 	</div>
-	<div class="col-md-6 text-right">
+	<div class = "col-md-6 text-right">
         {% if not currentUserID %}
-            <a href="{{url_for('showLogin')}}">
-                Click Here to Log in {{currentUserID}}
+            <a href = "{{url_for('showLogin')}}">
+                Click here to log in
             </a>
         {% else %}
-            <a href="{{url_for('disconnect')}}">
-                Disconnect User {{currentUserID}}
+            <a href = "{{url_for('disconnect')}}">
+                Log out
             </a>
         {% endif %}
 	</div>

@@ -52,7 +52,6 @@
             <!--TODO: get dynamic value for starting mapNo in case decide to change recently added list-->
             {% set mapNo = 4 %}
             {% for site in allSites %}
-                <!--make these links go to an individual site page, e.g. showSingleSite-->
                 <a href = "{{url_for('showSite', state_id = site.state_id)}}">
                     <div class="state-list">
                         <h5>{{ site.name }}</h5>
