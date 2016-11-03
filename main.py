@@ -295,9 +295,9 @@ def showStates():
     if not states:
         createStates()
     else:
-        allSites = session.query(Site).order_by(desc(Site.id)).limit(5).all()
+        front = session.query(Site).order_by(desc(Site.id)).limit(5).all()
         siteList = []
-        for a in allSites:
+        for a in front:
             siteList.append(a.state_id)
         try:
             currentUserID = login_session['user_id']
@@ -305,27 +305,25 @@ def showStates():
                 return render_template('states.html', states=states,
                                        sites=siteList,
                                        currentUserID=currentUserID,
-                                       allSites=allSites,
-                                       jsSites=
-                                       [s.serialize for s in allSites],
+                                       allSites=front,
+                                       jsSites=[s.serialize for s in front],
                                        jsStates=[s.serialize for s in states])
             else:
                 return render_template('states.html', states=states,
-                                       sites=siteList, allSites=allSites,
-                                       jsSites=
-                                       [s.serialize for s in allSites],
+                                       sites=siteList, allSites=front,
+                                       jsSites=[s.serialize for s in front],
                                        jsStates=[s.serialize for s in states],
                                        currentUserID="")
         except:
             return render_template('states.html', states=states,
-                                   sites=siteList, allSites=allSites,
-                                   jsSites=[s.serialize for s in allSites],
+                                   sites=siteList, allSites=front,
+                                   jsSites=[s.serialize for s in front],
                                    jsStates=[s.serialize for s in states],
                                    currentUserID="")
 
 
 # only Administrator can add new states
-@app.route('/state/new/', methods=['GET','POST'])
+@app.route('/state/new/', methods=['GET', 'POST'])
 def addState():
     if 'username' not in login_session:
         return redirect('/login')
@@ -343,8 +341,8 @@ def addState():
         return render_template('addState.html', currentUserID=currentUserID)
 
 
-#Edit a state
-@app.route('/state/<int:state_id>/edit/', methods = ['GET', 'POST'])
+# Edit a state
+@app.route('/state/<int:state_id>/edit/', methods=['GET', 'POST'])
 def editState(state_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -361,7 +359,7 @@ def editState(state_id):
             return redirect(url_for('showStates'))
         else:
             return render_template('editState.html', state=editedState,
-                currentUserID=currentUserID)
+                                   currentUserID=currentUserID)
     else:
         flash('Only the owner can edit this state. Allowed to edit: %s' %
               allowedToEdit)
@@ -372,7 +370,7 @@ def editState(state_id):
 # Administrator only can delete/edit states.
 # States cannot be deleted if there are sites
 # related to the state.
-@app.route('/state/<int:state_id>/delete/', methods = ['GET','POST'])
+@app.route('/state/<int:state_id>/delete/', methods=['GET', 'POST'])
 def deleteState(state_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -391,10 +389,11 @@ def deleteState(state_id):
                 flash('%s Successfully Deleted' % stateToDelete.name)
                 session.commit()
                 return redirect(url_for('showStates', state_id=state_id,
-                    currentUserID=currentUserID))
+                                        currentUserID=currentUserID))
             else:
                 return render_template('deleteState.html',
-                    state=stateToDelete, currentUserID=currentUserID)
+                                       state=stateToDelete,
+                                       currentUserID=currentUserID)
         else:
             flash('Only the owner can delete this state.')
             return redirect('/state/')
@@ -412,23 +411,25 @@ def showSite(state_id):
         currentUserID = login_session['user_id']
         if not currentUserID:
             return render_template('site.html', sites=sites, state=state,
-                creator=creator, currentUserID="",
-                jsSites=[s.serialize for s in sites],
-                jsStates=[state.serialize])
+                                   creator=creator, currentUserID="",
+                                   jsSites=[s.serialize for s in sites],
+                                   jsStates=[state.serialize])
         else:
             creator = getUserID(login_session['user_id'])
             return render_template('site.html', sites=sites, state=state,
-                creator=creator, currentUserID=currentUserID,
-                jsSites=[s.serialize for s in sites],
-                jsStates=[state.serialize])
+                                   creator=creator,
+                                   currentUserID=currentUserID,
+                                   jsSites=[s.serialize for s in sites],
+                                   jsStates=[state.serialize])
     except:
         return render_template('site.html', sites=sites, state=state,
-            creator=creator, currentUserID="",
-            jsSites=[s.serialize for s in sites],
-            jsStates=[state.serialize])
+                               creator=creator, currentUserID="",
+                               jsSites=[s.serialize for s in sites],
+                               jsStates=[state.serialize])
 
 
-@app.route('/state/<int:state_id>/site/<int:site_id>/', methods=['GET','POST'])
+@app.route('/state/<int:state_id>/site/<int:site_id>/',
+           methods=['GET', 'POST'])
 def showSingleSite(state_id, site_id):
     state = filterStatesById(state_id)
     site = filterSitesById(site_id)
@@ -437,22 +438,26 @@ def showSingleSite(state_id, site_id):
         currentUserID = login_session['user_id']
         if not currentUserID:
             return render_template('singleSite.html', site=site,
-                state=state, creator=creator, currentUserID="",
-                jsSites=[site.serialize], jsStates=[state.serialize])
+                                   state=state, creator=creator,
+                                   currentUserID="",
+                                   jsSites=[site.serialize],
+                                   jsStates=[state.serialize])
         else:
             creator = getUserID(login_session['user_id'])
             return render_template('singleSite.html', site=site,
-                state=state, creator=creator,
-                currentUserID=currentUserID, jsSites=[site.serialize],
-                jsStates=[state.serialize])
+                                   state=state, creator=creator,
+                                   currentUserID=currentUserID,
+                                   jsSites=[site.serialize],
+                                   jsStates=[state.serialize])
     except:
         return render_template('singleSite.html', site=site, state=state,
-            creator=creator, currentUserID="", jsSites=[site.serialize],
-            jsStates=[state.serialize])
+                               creator=creator, currentUserID="",
+                               jsSites=[site.serialize],
+                               jsStates=[state.serialize])
 
 
-#Create a new site
-@app.route('/state/<int:state_id>/site/new/', methods=['GET','POST'])
+# Create a new site
+@app.route('/state/<int:state_id>/site/new/', methods=['GET', 'POST'])
 def newSite(state_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -473,14 +478,15 @@ def newSite(state_id):
         session.commit()
         flash('New Site (%s) Successfully Created' % (newSite.name))
         return redirect(url_for('showSite', state_id=state_id,
-            currentUserID=currentUserID))
+                                currentUserID=currentUserID))
     else:
         return render_template('newsite.html', state_id=state_id,
-            state_name=state_name, currentUserID=currentUserID)
+                               state_name=state_name,
+                               currentUserID=currentUserID)
 
 
 # Create a new site from the state page
-@app.route('/state/site/new/', methods=['GET','POST'])
+@app.route('/state/site/new/', methods=['GET', 'POST'])
 def newSiteNoState():
     if 'username' not in login_session:
         return redirect('/login')
@@ -506,15 +512,15 @@ def newSiteNoState():
         session.commit()
         flash('New Site (%s) Successfully Created' % (newSite.name))
         return redirect(url_for('showSite', state_id=state_link,
-            currentUserID=currentUserID))
+                                currentUserID=currentUserID))
     else:
         return render_template('newsitenostate.html', state_list=state_list,
-            currentUserID=currentUserID)
+                               currentUserID=currentUserID)
 
 
 # Edit a site
 @app.route('/state/<int:state_id>/site/<int:site_id>/edit',
-           methods=['GET','POST'])
+           methods=['GET', 'POST'])
 def editSite(state_id, site_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -552,9 +558,10 @@ def editSite(state_id, site_id):
                 return redirect('/state/%s/site/' % state_id)
             else:
                 return render_template('editSite.html', state_id=state_id,
-                    site_id=site_id, site=editedSite,
-                    state_name=state_name, state_list=state_list,
-                    currentUserID=currentUserID)
+                                       site_id=site_id, site=editedSite,
+                                       state_name=state_name,
+                                       state_list=state_list,
+                                       currentUserID=currentUserID)
     else:
         flash('Only the owner can edit this site. Allowed to edit: %s'
               % allowedToEdit)
@@ -563,7 +570,7 @@ def editSite(state_id, site_id):
 
 # Delete a site
 @app.route('/state/<int:state_id>/site/<int:site_id>/delete',
-           methods = ['GET','POST'])
+           methods=['GET', 'POST'])
 def deleteSite(state_id, site_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -579,7 +586,7 @@ def deleteSite(state_id, site_id):
             return redirect(url_for('showSite', state_id=state_id))
         else:
             return render_template('deleteSite.html', site=siteToDelete,
-                currentUserID=currentUserID)
+                                   currentUserID=currentUserID)
     else:
         flash('Only the owner can delete this site. Allowed to edit: %s'
               % allowedToDelete)
@@ -666,29 +673,29 @@ def stateHasSites(state_id):
 
 def createStates():
     states = [["AL", "Alabama"], ["AK", "Alaska"], ["AZ", "Arizona"],
-             ["AR", "Arkansas"], ["CA", "California"], ["CO", "Colorado"],
-             ["CT", "Connecticut"], ["DC", "District of Columbia"],
-             ["DE", "Delaware"], ["FL", "Florida"], ["GA", "Georgia"],
-             ["HI", "Hawaii"], ["ID", "Idaho"], ["IL", "Illinois"],
-             ["IN", "Indiana"], ["IA", "Iowa"], ["KS", "Kansas"],
-             ["KY", "Kentucky"], ["LA", "Louisiana"], ["ME", "Maine"],
-             ["MD", "Maryland"], ["MA", "Massachusetts"], ["MI", "Michigan"],
-             ["MN", "Minnesota"], ["MS", "Mississippi"], ["MO", "Missouri"],
-             ["MT", "Montana"], ["NE", "Nebraska"], ["NV", "Nevada"],
-             ["NH", "New Hampshire"], ["NJ", "New Jersey"],
-             ["NM", "New Mexico"], ["NY", "New York"],
-             ["NC", "North Carolina"], ["ND", "North Dakota"], ["OH", "Ohio"],
-             ["OK", "Oklahoma"], ["OR", "Oregon"], ["PA", "Pennsylvania"],
-             ["RI", "Rhode Island"], ["SC", "South Carolina"],
-             ["SD", "South Dakota"], ["TN", "Tennessee"], ["TX", "Texas"],
-             ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"],
-             ["WA", "Washington"], ["WV", "West Virginia"],
-             ["WI", "Wisconsin"],
-             ["WY", "Wyoming"]]
+              ["AR", "Arkansas"], ["CA", "California"], ["CO", "Colorado"],
+              ["CT", "Connecticut"], ["DC", "District of Columbia"],
+              ["DE", "Delaware"], ["FL", "Florida"], ["GA", "Georgia"],
+              ["HI", "Hawaii"], ["ID", "Idaho"], ["IL", "Illinois"],
+              ["IN", "Indiana"], ["IA", "Iowa"], ["KS", "Kansas"],
+              ["KY", "Kentucky"], ["LA", "Louisiana"], ["ME", "Maine"],
+              ["MD", "Maryland"], ["MA", "Massachusetts"], ["MI", "Michigan"],
+              ["MN", "Minnesota"], ["MS", "Mississippi"], ["MO", "Missouri"],
+              ["MT", "Montana"], ["NE", "Nebraska"], ["NV", "Nevada"],
+              ["NH", "New Hampshire"], ["NJ", "New Jersey"],
+              ["NM", "New Mexico"], ["NY", "New York"],
+              ["NC", "North Carolina"], ["ND", "North Dakota"], ["OH", "Ohio"],
+              ["OK", "Oklahoma"], ["OR", "Oregon"], ["PA", "Pennsylvania"],
+              ["RI", "Rhode Island"], ["SC", "South Carolina"],
+              ["SD", "South Dakota"], ["TN", "Tennessee"], ["TX", "Texas"],
+              ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"],
+              ["WA", "Washington"], ["WV", "West Virginia"],
+              ["WI", "Wisconsin"],
+              ["WY", "Wyoming"]]
     r = 0
     for s in states:
-        newState = State(name = s[r][1],
-                         abbrev = s[r][0])
+        newState = State(name=s[r][1],
+                         abbrev=s[r][0])
         session.add(newState)
         session.commit()
 
