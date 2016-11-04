@@ -43,7 +43,7 @@ The *Starry Night Database* contains functionality for adding, editing, and dele
 | Bootstrap | Framework for front end                          |                                             | [More info](http://getbootstrap.com/) |
 | CSS       | Language for styling web pages                   |                                             | [More info](http://www.w3schools.com/css/css_intro.asp) |
 | HTML      | Language for structuring web pages               |                                             | [More info](http://www.w3schools.com/html/html_intro.asp) |
-| JSON      | Data Interchange Format                          | App creates and utilizes JSON datasets      | App[More info](http://www.json.org/) |
+| JSON      | Data Interchange Format                          | App creates and utilizes JSON datasets      | [More info](http://www.json.org/) |
 
 <a id="folders-files"></a>
 ##Folders & Files
@@ -74,10 +74,17 @@ The *Starry Night Database* contains functionality for adding, editing, and dele
 
 <a id="libraries-modules"></a>
 ##Libraries & Modules
-| Library or Module | Purpose                                  |
-| ----------------- | ---------------------------------------- |
-| psycopg2          | API for PostgreSQL db use                |
-| bleach            | used to clean input of malicious scripts |
+| Library or Module | Purpose                                                        |
+| ----------------- | -------------------------------------------------------------- |
+| oauth2client      | Python library for accessing resources protected by OAuth 2.0  |
+| httplib2          | python library to interact with the web                        |
+| flask             | Python framework (see above in [Technologies](#technologies))  |
+| sqlalchemy        | allows for SQL queries                                         |
+| random            | generates numbers (used in login route)                        |
+| string            | allows for use of string functions                             |
+| json              | provides tools for working with JSON data                      |
+| requests          | allows for getting info from http request                      |
+
 <a id="using-software"></a>
 ##Using the Software
 **To use the software**
