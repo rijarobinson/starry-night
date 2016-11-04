@@ -19,8 +19,8 @@ class User(Base):
        return {
            'name'         : self.name,
            'id'           : self.id,
-           'email'         : self.email,
-           'picture'           : self.picture,
+           'email'        : self.email,
+           'picture'      : self.picture,
        }
 
 
@@ -39,11 +39,13 @@ class State(Base):
        return {
            'name'         : self.name,
            'id'           : self.id,
+           'abbrev'       : self.abbrev,
+           'user_id'      : self.user_id,
        }
+
 
 class Site(Base):
     __tablename__ = 'site'
-
 
     name =Column(String(80), nullable = False)
     id = Column(Integer, primary_key = True)
@@ -61,15 +63,16 @@ class Site(Base):
     def serialize(self):
        """Return object data in easily serializeable format"""
        return {
-           'name'         : self.name,
-           'notes'         : self.notes,
+           'name'       : self.name,
+           'notes'      : self.notes,
            'id'         : self.id,
-           'city'         : self.city,
-           'site_type'         : self.site_type,
-           'phone'         : self.phone,
-           'website'         : self.website,
+           'city'       : self.city,
+           'site_type'  : self.site_type,
+           'phone'      : self.phone,
+           'website'    : self.website,
+           'state_id'   : self.state_id,
+           'user_id'    : self.user_id,
        }
-
 
 
 engine = create_engine('sqlite:///starry-night.db')
