@@ -94,22 +94,24 @@ The *Starry Night Database* contains functionality for adding, editing, and dele
 3.  Install [Vagrant](https://www.vagrantup.com/downloads.html).
 4.  Fetch the [GitHub repository](https://github.com/udacity/fullstack-nanodegree-vm) created for the project by first Forking, and then getting the URL from GitHub for cloning (use HTTPS).
 5.  Open **Git Bash** and cd to the desired directory for the application.
-6.  Run "git clone PASTE_CLONED_PATH_FROM_GITHUB_HERE fullstack". This creates a directory called "fullstack" within your selected folder as well as the vagrant configuration.
-7.  Replace the stock *tournament.py* and *tournament.sql* files with the two files in the "vagrant/tournament" folder of the same name from this repository. (The files provided by Udacity are blank, pre-project completion files.)
-8.  Launch the Virtual Machine by running "vagrant up" in the vagrant directory ("vagrant halt" stops the VM).
-9.  Run "vagrant ssh" to log into the virtual machine ("exit" will log you off).
-10.  Run "cd /vagrant/tournament" if necessary to switch to the tournament directory.
-11.  Run "psql" to run the querying software.
----ADD SECTION TO RUN DATABASE FILE AND CREATE STATES, FIRST USER LOGGED IN WILL BE OWNER OF STATE LIST
-
-13.  At "vagrant=>", run "\i tournament.sql" to create the database, tables, and views and connect to the tournament database. If you would like to see a list of the tables, run "\dt". For other commands you can use in psql, check [here](http://postgresguide.com/utilities/psql.html). Note that if you are connected to the database, you will see "tournament=>". If you don't see this (after the initial creation of tables), you can connect using "\c tournament".
-15.  Quit psql with "\q" and run "tournament_test.py" to see the tests run on the *tournament.py* file.
+6.  Run "git clone PASTE_CLONED_PATH_FROM_GITHUB_HERE fullstack". This creates a directory called "fullstack" within your selected folder as well as the vagrant configuration. You'll need to change the ports in the Vagrantfile to match that of the app: 8000.
+7.  Add the files from this repository to your project.
+8.  In **Git Bash** Switch to the directory containing your **main.py** file.
+9.  Launch the Virtual Machine by running "vagrant up" ("vagrant halt" stops the VM).
+10.  Run "vagrant ssh" to log into the virtual machine ("exit" will log you off).
+11.  cd to /vagrant.
+12.  Type "python database_setup.py" to add the database and tables.
+13.  Type "python add_states.py" to add the states to the database.
+14.  Type "python main.py" to start the server.
+15.  You can test the app by running localhost on your web browser.
 
 Refer to [this page](https://udacity.atlassian.net/wiki/display/BENDH/Vagrant+VM+Installation) from Udacity for additional install details and screen shots.
 
 **To customize the files**
-Feel free to modify your copy of *tournament.py* and run *tournament_test.py* to see how this affects the outcomes of the test. You can use print statements within *tournament.py* to troubleshoot your code.
+Feel free to modify your copy of the template files to customize to a different use. You will need to get your own API key for use of Google and Facebook login and the Maps APIs.
 
-Stubs and test file were provided by [Udacity](http://www.Udacity.com). Additional instruction on Back End Development is available by signing up for a class on their site. No code was directly copied and pasted, but resources such as [Stack Overflow](http://www.stackoverflow.com) and were used for guidance. Additional enhancements by Marija Robinson.
+Instructions for this project were provided by [Udacity](http://www.Udacity.com). Additional instruction on Full Stack Application Development is available by signing up for a class on their site. No code was directly copied and pasted, but resources such as [Stack Overflow](http://www.stackoverflow.com) and Udacity's instructional videos were used for guidance.
+
+Images on the app were retrieved from the [NASA Gallery](https://www.nasa.gov/multimedia/imagegallery/).
 
 I welcome any feedback on this project at marija@springmail.com.
