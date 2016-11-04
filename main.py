@@ -113,8 +113,7 @@ def gconnect():
     login_session['user_id'] = userIDInDB
     # code to check to make sure record added in db
     userInfo = getUserInfo(userIDInDB)
-    verifyUserData = (userInfo.email + " " + userInfo.name +
-                      " " + str(userInfo.id))
+    verifyUserData = (userInfo.email + " " + userInfo.name + " " + str(userInfo.id))  #noqa
 
     output = '<div class="row"><div class="col-md-12 text-center"'
     output += '<h3>Welcome, '
@@ -292,34 +291,31 @@ def statesJSON():
 @app.route('/state/')
 def showStates():
     states = allStates()
-    if not states:
-        createStates()
-    else:
-        front = session.query(Site).order_by(desc(Site.id)).limit(5).all()
-        siteList = []
-        for a in front:
-            siteList.append(a.state_id)
-        try:
-            currentUserID = login_session['user_id']
-            if currentUserID:
-                return render_template('states.html', states=states,
-                                       sites=siteList,
-                                       currentUserID=currentUserID,
-                                       allSites=front,
-                                       jsSites=[s.serialize for s in front],
-                                       jsStates=[s.serialize for s in states])
-            else:
-                return render_template('states.html', states=states,
-                                       sites=siteList, allSites=front,
-                                       jsSites=[s.serialize for s in front],
-                                       jsStates=[s.serialize for s in states],
-                                       currentUserID="")
-        except:
+    front = session.query(Site).order_by(desc(Site.id)).limit(5).all()
+    siteList = []
+    for a in front:
+        siteList.append(a.state_id)
+    try:
+        currentUserID = login_session['user_id']
+        if currentUserID:
+            return render_template('states.html', states=states,
+                                   sites=siteList,
+                                   currentUserID=currentUserID,
+                                   allSites=front,
+                                   jsSites=[s.serialize for s in front],
+                                   jsStates=[s.serialize for s in states])
+        else:
             return render_template('states.html', states=states,
                                    sites=siteList, allSites=front,
                                    jsSites=[s.serialize for s in front],
                                    jsStates=[s.serialize for s in states],
                                    currentUserID="")
+    except:
+        return render_template('states.html', states=states,
+                               sites=siteList, allSites=front,
+                               jsSites=[s.serialize for s in front],
+                               jsStates=[s.serialize for s in states],
+                               currentUserID="")
 
 
 # only Administrator can add new states
@@ -530,38 +526,38 @@ def editSite(state_id, site_id):
         editedSite = filterSitesById(site_id)
         state = filterStatesById(state_id)
         states = allStates()
-        state_name = state.name
         state_list = []
-        for state in states:
-            state_list.append(state.name)
-            if request.method == 'POST':
-                state_name = request.form['state']
-                state = filterStatesByName(state_name)
-                state_link = state.id
-                if request.form['name']:
-                    editedSite.name = request.form['name']
-                if request.form['notes']:
-                    editedSite.notes = request.form['notes']
-                if request.form['site_type']:
-                    editedSite.site_type = request.form['site_type']
-                if request.form['city']:
-                    editedSite.city = request.form['city']
-                if request.form['state']:
-                    editedSite.state_id = state_link
-                if request.form['phone']:
-                    editedSite.phone = request.form['phone']
-                if request.form['website']:
-                    editedSite.website = request.form['website']
-                session.add(editedSite)
-                session.commit()
-                flash('Site Successfully Edited')
-                return redirect('/state/%s/site/' % state_id)
-            else:
-                return render_template('editSite.html', state_id=state_id,
-                                       site_id=site_id, site=editedSite,
-                                       state_name=state_name,
-                                       state_list=state_list,
-                                       currentUserID=currentUserID)
+        for s in states:
+            state_list.append(s.name)
+        state_name = state.name
+        if request.method == 'POST':
+            state_name = request.form['state']
+            state = filterStatesByName(state_name)
+            state_link = state.id
+            if request.form['name']:
+                editedSite.name = request.form['name']
+            if request.form['notes']:
+                editedSite.notes = request.form['notes']
+            if request.form['site_type']:
+                editedSite.site_type = request.form['site_type']
+            if request.form['city']:
+                editedSite.city = request.form['city']
+            if request.form['state']:
+                editedSite.state_id = state_link
+            if request.form['phone']:
+                editedSite.phone = request.form['phone']
+            if request.form['website']:
+                editedSite.website = request.form['website']
+            session.add(editedSite)
+            session.commit()
+            flash('Site Successfully Edited')
+            return redirect('/state/%s/site/' % state_id)
+        else:
+            return render_template('editSite.html', state_id=state_id,
+                                   site_id=site_id, site=editedSite,
+                                   state_name=state_name,
+                                   state_list=state_list,
+                                   currentUserID=currentUserID)
     else:
         flash('Only the owner can edit this site. Allowed to edit: %s'
               % allowedToEdit)
@@ -669,35 +665,6 @@ def stateHasSites(state_id):
         return hasSites
     except:
         None
-
-
-def createStates():
-    states = [["AL", "Alabama"], ["AK", "Alaska"], ["AZ", "Arizona"],
-              ["AR", "Arkansas"], ["CA", "California"], ["CO", "Colorado"],
-              ["CT", "Connecticut"], ["DC", "District of Columbia"],
-              ["DE", "Delaware"], ["FL", "Florida"], ["GA", "Georgia"],
-              ["HI", "Hawaii"], ["ID", "Idaho"], ["IL", "Illinois"],
-              ["IN", "Indiana"], ["IA", "Iowa"], ["KS", "Kansas"],
-              ["KY", "Kentucky"], ["LA", "Louisiana"], ["ME", "Maine"],
-              ["MD", "Maryland"], ["MA", "Massachusetts"], ["MI", "Michigan"],
-              ["MN", "Minnesota"], ["MS", "Mississippi"], ["MO", "Missouri"],
-              ["MT", "Montana"], ["NE", "Nebraska"], ["NV", "Nevada"],
-              ["NH", "New Hampshire"], ["NJ", "New Jersey"],
-              ["NM", "New Mexico"], ["NY", "New York"],
-              ["NC", "North Carolina"], ["ND", "North Dakota"], ["OH", "Ohio"],
-              ["OK", "Oklahoma"], ["OR", "Oregon"], ["PA", "Pennsylvania"],
-              ["RI", "Rhode Island"], ["SC", "South Carolina"],
-              ["SD", "South Dakota"], ["TN", "Tennessee"], ["TX", "Texas"],
-              ["UT", "Utah"], ["VT", "Vermont"], ["VA", "Virginia"],
-              ["WA", "Washington"], ["WV", "West Virginia"],
-              ["WI", "Wisconsin"],
-              ["WY", "Wyoming"]]
-    r = 0
-    for s in states:
-        newState = State(name=s[r][1],
-                         abbrev=s[r][0])
-        session.add(newState)
-        session.commit()
 
 
 if __name__ == '__main__':
