@@ -22,6 +22,10 @@
         {% endwith %}
     </div>
     <div class="row">
+        <div class="col-md-12 text-center">
+            <h3>Locate a great place for stargazing in the U.S.</h3>
+        </div>
+    <div class="row">
         <div class="col-md-6">
             <h2>States that have sites listed</h2>
             {% for state in states %}
@@ -46,6 +50,7 @@
             {% endfor %}
             <div class="padding-top">
                 {% if currentUserID == 1 %}
+                Note to Administrator: 50 States are loaded plus the District of Columbia. Do not use Add New State option unless you need to add a U.S. Territory.</br>
                     <a href="{{url_for('addState')}}">
                         <button class="btn btn-default padding-top" id="new-state" type="button">
                             <span class="glyphicon glyphicon-star" aria-hidden="true"></span>

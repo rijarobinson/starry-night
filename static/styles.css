@@ -48,6 +48,10 @@ a {
 	padding-top: 30px;
 }
 
+.pad-button-bottom {
+	padding-bottom: 20px;
+}
+
 .padding-bottom {
 	padding-bottom: 30px;
 }
@@ -73,13 +77,23 @@ a {
 }
 
 .btn.delete {
-	border-color: #aaaaaa;
-	color: #aaaaaa;
+	border-color: #AAA;
+	color: #AAA;
 }
 
 .btn.delete:hover {
-	border-color: #aaaaaa;
+	border-color: #AAA;
 	color: red;
+}
+
+.btn.cancel {
+	border-color: #FFF;
+	color: #FFF;
+}
+
+.btn.cancel:hover {
+	border-color: #FFF;
+	color: #FFF;
 }
 
 .glyphicon {

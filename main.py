@@ -340,7 +340,10 @@ def addState():
 # Edit a state
 @app.route('/state/<int:state_id>/edit/', methods=['GET', 'POST'])
 def editState(state_id):
-    if 'username' not in login_session:
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+    except:
         return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToEdit = thisStateOwner(login_session['user_id'], state_id)
@@ -357,8 +360,7 @@ def editState(state_id):
             return render_template('editState.html', state=editedState,
                                    currentUserID=currentUserID)
     else:
-        flash('Only the owner can edit this state. Allowed to edit: %s' %
-              allowedToEdit)
+        flash("Only the owner can edit this state.")
         return redirect('/state/')
 
 
@@ -515,10 +517,13 @@ def newSiteNoState():
 
 
 # Edit a site
-@app.route('/state/<int:state_id>/site/<int:site_id>/edit',
+@app.route('/state/<int:state_id>/site/<int:site_id>/edit/',
            methods=['GET', 'POST'])
 def editSite(state_id, site_id):
-    if 'username' not in login_session:
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+    except:
         return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToEdit = thisSiteOwner(login_session['user_id'], site_id)
@@ -559,8 +564,7 @@ def editSite(state_id, site_id):
                                    state_list=state_list,
                                    currentUserID=currentUserID)
     else:
-        flash('Only the owner can edit this site. Allowed to edit: %s'
-              % allowedToEdit)
+        flash("Only the owner can edit this site.")
         return redirect('/state/%s/site/' % state_id)
 
 
@@ -568,7 +572,10 @@ def editSite(state_id, site_id):
 @app.route('/state/<int:state_id>/site/<int:site_id>/delete',
            methods=['GET', 'POST'])
 def deleteSite(state_id, site_id):
-    if 'username' not in login_session:
+    try:
+        if 'username' not in login_session:
+            return redirect('/login')
+    except:
         return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToDelete = thisSiteOwner(login_session['user_id'], site_id)
@@ -584,8 +591,7 @@ def deleteSite(state_id, site_id):
             return render_template('deleteSite.html', site=siteToDelete,
                                    currentUserID=currentUserID)
     else:
-        flash('Only the owner can delete this site. Allowed to edit: %s'
-              % allowedToDelete)
+        flash("Only the owner can delete this site.")
         return redirect('/state/%s/site/' % state_id)
 
 
