@@ -40,7 +40,6 @@ class State(Base):
            'name'         : self.name,
            'id'           : self.id,
            'abbrev'       : self.abbrev,
-           'user_id'      : self.user_id,
        }
 
 
@@ -71,7 +70,6 @@ class Site(Base):
            'phone'      : self.phone,
            'website'    : self.website,
            'state_id'   : self.state_id,
-           'user_id'    : self.user_id,
        }
 
 

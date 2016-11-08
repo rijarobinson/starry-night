@@ -286,7 +286,8 @@ def admin_access(f):
             return redirect(url_for('showStates'))
     return decorated_function
 
-# JSON APIs to view State List
+
+# JSON APIs to view sites in State List
 @app.route('/state/<int:state_id>/site/JSON')
 def stateSiteJSON(state_id):
     state = filterStatesById(state_id)
@@ -294,13 +295,22 @@ def stateSiteJSON(state_id):
     return jsonify(Sites=[s.serialize for s in sites])
 
 
+# JSON APIs to view single site
 @app.route('/state/<int:state_id>/site/<int:site_id>/JSON')
 def siteJSON(state_id, site_id):
     sites = filterSitesById(site_id)
     return jsonify(Site=sites.serialize)
 
 
-@app.route('/state/JSON')
+# JSON API to view all states
+@app.route('/states/JSON')
+def statesJSON():
+    states = session.query(State).all()
+    return jsonify(states=[s.serialize for s in states])
+
+
+# JSON API to view all sites
+@app.route('/sites/JSON')
 def statesJSON():
     sites = session.query(Site).all()
     return jsonify(sites=[s.serialize for s in sites])
