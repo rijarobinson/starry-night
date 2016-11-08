@@ -1,23 +1,23 @@
-from flask import Flask, render_template, request, redirect, jsonify, url_for, flash  # noqa
-app = Flask(__name__)
-
+from flask import Flask, render_template, request, redirect, jsonify, url_for, flash, g  # noqa
 from sqlalchemy import create_engine, asc, desc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, State, Site, User
-
 from flask import session as login_session
 import random
 import string
-
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.client import FlowExchangeError
 import httplib2
 import json
 from flask import make_response
 import requests
+from functools import wraps
+
+app = Flask(__name__)
 
 CLIENT_ID = (json.loads(open('client_secrets.json', 'r')
                         .read())['web']['client_id'])
+
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///starry-night.db')
@@ -113,7 +113,7 @@ def gconnect():
     login_session['user_id'] = userIDInDB
     # code to check to make sure record added in db
     userInfo = getUserInfo(userIDInDB)
-    verifyUserData = (userInfo.email + " " + userInfo.name + " " + str(userInfo.id))  #noqa
+    verifyUserData = (userInfo.email + " " + userInfo.name + " " + str(userInfo.id))  # noqa
 
     output = '<div class="row"><div class="col-md-12 text-center"'
     output += '<h3>Welcome, '
@@ -265,6 +265,26 @@ def disconnect():
         flash("You were not logged in")
         return redirect(url_for('showStates'))
 
+def logged_in(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if login_session['username'] is not "":
+            return f(*args, **kwargs)
+        else:
+            flash("Log in for privileged access.")
+            return redirect(url_for('showLogin'))
+    return decorated_function
+
+
+def admin_access(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if login_session['user_id'] == 1:
+            return f(*args, **kwargs)
+        else:
+            flash("Only the admin can add states.")
+            return redirect(url_for('showStates'))
+    return decorated_function
 
 # JSON APIs to view State List
 @app.route('/state/<int:state_id>/site/JSON')
@@ -320,9 +340,9 @@ def showStates():
 
 # only Administrator can add new states
 @app.route('/state/new/', methods=['GET', 'POST'])
+@logged_in
+@admin_access
 def addState():
-    if 'username' not in login_session:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     if request.method == 'POST':
         user_id = login_session['user_id']
@@ -339,12 +359,9 @@ def addState():
 
 # Edit a state
 @app.route('/state/<int:state_id>/edit/', methods=['GET', 'POST'])
+@logged_in
+@admin_access
 def editState(state_id):
-    try:
-        if 'username' not in login_session:
-            return redirect('/login')
-    except:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToEdit = thisStateOwner(login_session['user_id'], state_id)
     if allowedToEdit:
@@ -369,9 +386,9 @@ def editState(state_id):
 # States cannot be deleted if there are sites
 # related to the state.
 @app.route('/state/<int:state_id>/delete/', methods=['GET', 'POST'])
+@logged_in
+@admin_access
 def deleteState(state_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToDelete = thisStateOwner(login_session['user_id'], state_id)
     if stateHasSites(state_id):
@@ -456,9 +473,8 @@ def showSingleSite(state_id, site_id):
 
 # Create a new site
 @app.route('/state/<int:state_id>/site/new/', methods=['GET', 'POST'])
+@logged_in
 def newSite(state_id):
-    if 'username' not in login_session:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     # Any logged in user can add a site to a state
     state = filterStatesById(state_id)
@@ -485,9 +501,8 @@ def newSite(state_id):
 
 # Create a new site from the state page
 @app.route('/state/site/new/', methods=['GET', 'POST'])
+@logged_in
 def newSiteNoState():
-    if 'username' not in login_session:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     # Any logged in user can add a site
     states = allStates()
@@ -519,12 +534,8 @@ def newSiteNoState():
 # Edit a site
 @app.route('/state/<int:state_id>/site/<int:site_id>/edit/',
            methods=['GET', 'POST'])
+@logged_in
 def editSite(state_id, site_id):
-    try:
-        if 'username' not in login_session:
-            return redirect('/login')
-    except:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToEdit = thisSiteOwner(login_session['user_id'], site_id)
     if allowedToEdit:
@@ -571,12 +582,8 @@ def editSite(state_id, site_id):
 # Delete a site
 @app.route('/state/<int:state_id>/site/<int:site_id>/delete',
            methods=['GET', 'POST'])
+@logged_in
 def deleteSite(state_id, site_id):
-    try:
-        if 'username' not in login_session:
-            return redirect('/login')
-    except:
-        return redirect('/login')
     currentUserID = login_session['user_id']
     allowedToDelete = thisSiteOwner(login_session['user_id'], site_id)
     if allowedToDelete:
