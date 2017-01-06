@@ -93,6 +93,8 @@ def gconnect():
 
     # Store the access token in the session for later use.
     login_session['provider'] = 'google'
+    # TODO: I think this was changed to = credentials.access_token in prod,
+    # required another line in oauth import, see production file (__init__.py)
     login_session['credentials'] = credentials
     login_session['gplus_id'] = gplus_id
 
@@ -138,6 +140,9 @@ def gdisconnect():
                                  401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    # TODO: I think this was changed to just = credentials in prod, since
+    # I already got the access token
+    # required another line in oauth import, see production file (__init__.py)
     my_access_token = credentials.access_token
     if my_access_token is None:
         print 'Access token is None'
@@ -311,7 +316,7 @@ def statesJSON():
 
 # JSON API to view all sites
 @app.route('/sites/JSON')
-def statesJSON():
+def sitesJSON():
     sites = session.query(Site).all()
     return jsonify(sites=[s.serialize for s in sites])
 
@@ -440,7 +445,7 @@ def showSite(state_id):
                                    jsSites=[s.serialize for s in sites],
                                    jsStates=[state.serialize])
         else:
-            creator = getUserID(login_session['user_id'])
+            creator = getUserID(login_session['email'])
             return render_template('site.html', sites=sites, state=state,
                                    creator=creator,
                                    currentUserID=currentUserID,
@@ -468,7 +473,7 @@ def showSingleSite(state_id, site_id):
                                    jsSites=[site.serialize],
                                    jsStates=[state.serialize])
         else:
-            creator = getUserID(login_session['user_id'])
+            creator = getUserID(login_session['email'])
             return render_template('singleSite.html', site=site,
                                    state=state, creator=creator,
                                    currentUserID=currentUserID,
@@ -639,6 +644,9 @@ def createUser(login_session):
 
 
 def allStates():
+    # Note in case issues: added session.commit() per
+    # psycopg2 documentation, not sure it was necessary
+    # but something to check if next time deploy has errors
     return session.query(State).order_by(asc(State.name)).all()
 
 
